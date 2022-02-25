@@ -311,14 +311,14 @@ animations = {
     124: cycle([SPRING_GREEN] * 10 + [RED] * 10),
     125: cycle([GOLD] * 10 + [AQUA] * 10),
 
-    126: cycle([BLACK] * 3 + [RED] * 2),
-    127: cycle([BLACK] * 3 + [YELLOW] * 2),
-    128: cycle([BLACK] * 3 + [PURPLE] * 2),
-    129: cycle([BLACK] * 3 + [BLUE] * 2),
-    130: cycle([BLACK] * 3 + [ORANGE] * 2),
-    131: cycle([BLACK] * 3 + [LIME] * 2),
+    126: cycle([BLACK] * 5 + [RED] * 2),
+    127: cycle([BLACK] * 5 + [YELLOW] * 2),
+    128: cycle([BLACK] * 5 + [PURPLE] * 2),
+    129: cycle([BLACK] * 5 + [BLUE] * 2),
+    130: cycle([BLACK] * 5 + [ORANGE] * 2),
+    131: cycle([BLACK] * 5 + [LIME] * 2),
 
-    132: cycle(colortools.Scale([(PINK, 0), (PURPLE, 10), (PINK, 20)]).between(0, 20)),
+    132: cycle(colortools.Scale([(PINK, 0), (BLUE, 10), (PINK, 20)]).between(0, 20)),
     133: cycle(colortools.Scale([(RED, 0), (YELLOW, 10), (RED, 20)]).between(0, 20)),
     134: cycle(colortools.Scale([(LIME, 0), (BLUE, 10), (LIME, 20)]).between(0, 20)),
     135: cycle(colortools.Scale([(LIME, 0), (BLUE, 10), (LIME, 20)]).between(0, 20)),
@@ -342,14 +342,11 @@ animations = {
 }
 
 
-RESET = '\033[0m'
-
-def get_color_escape(r, g, b, background=False):
-    return '\033[{};2;{};{};{}m'.format(48 if background else 38, r, g, b)
-
 
 if __name__ == '__main__':
-    leds = ledtools.Strip(None, 290, PINK, 255)
+    length = input("📎 \033[94mPlease enter led length:\033[0m ")
+    leds = ledtools.Strip(None, int(length), PINK, 255)
+    animator = ledtools.Strips([leds])
 
     while True:
         cmd = input('✨ \033[94mNext:\033[0m ')
@@ -358,20 +355,16 @@ if __name__ == '__main__':
         animation = animations.get(int(cmd))
 
         if animation is not None:
-            for ms in animation(leds):
+            for ms in animator.animate(animation):
                 brightness = leds.brightness / 255
                 output = ""
 
                 for pixel in leds.pixels:
                     color = colour.Color(hsl=(pixel.hue, pixel.saturation, pixel.luminance * brightness))
-                    output += get_color_escape(int(color.red * 255), int(color.green * 255), int(color.blue * 255), False)
+                    output += f'\033[38;2;{int(color.red * 255)};{int(color.green * 255)};{int(color.blue * 255)}m'
                     output += "◼︎"
-                    output += RESET
+                    output += '\033[0m'
 
                 print(output, end='\r')
                 time.sleep(ms/1000)
-
-
-
-
 
