@@ -50,6 +50,50 @@ class TestStrip(unittest.TestCase):
         self.assertEqual(self.leds.pixels, [colour.Color("blue"), colour.Color("blue"), colour.Color("blue"), colour.Color("blue"), colour.Color("blue"), colour.Color("blue")])
 
 
+class TestFlashFor(unittest.TestCase):
+    leds = ledtools.Strip(None, 6, colour.Color("orange"), 255)
+
+    def test_flash_for_seconds(self):
+        on = [colour.Color("blue")] * 6
+        off = [colour.Color("black")] * 6
+
+        flash = self.leds.flash_for([colour.Color("blue")], 500, seconds=2)
+
+        next(flash)
+        self.assertEqual(self.leds.pixels, on)
+
+        next(flash)
+        self.assertEqual(self.leds.pixels, off)
+
+        next(flash)
+        self.assertEqual(self.leds.pixels, on)
+
+        next(flash)
+        self.assertEqual(self.leds.pixels, off)
+
+        self.assertRaises(StopIteration, next, flash)
+
+    def test_flash_for_n(self):
+        on = [colour.Color("blue")] * 6
+        off = [colour.Color("black")] * 6
+
+        flash = self.leds.flash_for([colour.Color("blue")], 500, n=2)
+
+        next(flash)
+        self.assertEqual(self.leds.pixels, on)
+
+        next(flash)
+        self.assertEqual(self.leds.pixels, off)
+
+        next(flash)
+        self.assertEqual(self.leds.pixels, on)
+
+        next(flash)
+        self.assertEqual(self.leds.pixels, off)
+
+        self.assertRaises(StopIteration, next, flash)
+
+
 class TestCycle(unittest.TestCase):
     def test_initial_setup(self):
         leds = ledtools.Strip(None, 6, colour.Color("blue"), 255)

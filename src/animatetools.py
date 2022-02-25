@@ -42,7 +42,7 @@ def chain(functions):
 
 def flash(color):
     def with_strip(strip):
-        for x in strip.flash_for_n(color, 1, BETWEEN_STRIP_CHANGES_SLOW):
+        for x in strip.flash_for([color], BETWEEN_STRIP_CHANGES_SLOW, n=1):
             yield x
 
     return with_strip
@@ -50,7 +50,7 @@ def flash(color):
 
 def flash_then_on(from_color, flash_freq, to_color, to_brightness, to_seconds):
     def with_strip(strip):
-        for x in strip.flash_for_n(from_color, flash_freq, BETWEEN_STRIP_CHANGES_SLOW):
+        for x in strip.flash_for([from_color], BETWEEN_STRIP_CHANGES_SLOW, n=flash_freq):
             yield x
 
         for x in strip.on(to_color, to_seconds, to_brightness):
@@ -83,7 +83,7 @@ def color_swipe_to_color(start_color, start_seconds, swipe_color, swipe_speed, e
 
 def flicker_then_on(from_color, flicker_seconds, to_color, to_brightness, to_seconds):
     def with_strip(strip):
-        for x in strip.flicker(from_color, flicker_seconds, BETWEEN_LED_CHANGES_FAST):
+        for x in strip.flash_for([from_color], BETWEEN_LED_CHANGES_SLOW, brightness=50, seconds=flicker_seconds):
             yield x
 
         for x in strip.on(to_color, to_seconds, to_brightness):
@@ -94,7 +94,7 @@ def flicker_then_on(from_color, flicker_seconds, to_color, to_brightness, to_sec
 
 def flash_for_seconds(colors, seconds):
     def with_strip(strip):
-        for x in strip.flash_for_seconds(colors, seconds, BETWEEN_LED_CHANGES_FAST):
+        for x in strip.flash_for(colors, BETWEEN_STRIP_CHANGES_SLOW, seconds=seconds):
             yield x
 
     return with_strip
@@ -207,7 +207,6 @@ animations = {
     30:  color_swipe_to_color(ORANGE, 5, YELLOW, BETWEEN_LED_CHANGES_SLOW, YELLOW, 5),
     31:  color_swipe_to_color(PURPLE, 5, YELLOW, BETWEEN_LED_CHANGES_SLOW, YELLOW, 5),
 
-    # Debug
     32:  flicker_then_on(LIME, 5, LIME, LOW_BRIGHTNESS, 5),
     33:  flicker_then_on(BLUE, 5, BLUE, LOW_BRIGHTNESS, 5),
     34:  flicker_then_on(RED, 5, RED, LOW_BRIGHTNESS, 5),
@@ -220,7 +219,6 @@ animations = {
     42:  flicker_then_on(TURQUOISE, 5, TURQUOISE, LOW_BRIGHTNESS, 5),
     43:  flicker_then_on(AQUA, 5, AQUA, LOW_BRIGHTNESS, 5),
     44:  flicker_then_on(PINK, 5, PINK, LOW_BRIGHTNESS, 5),
-    # --
 
     45:  flash_then_on(RED, 3, BLUE, HIGH_BRIGHTNESS, 10),
     46:  flash_then_on(BLUE, 3, LIME, HIGH_BRIGHTNESS, 10),

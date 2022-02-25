@@ -44,39 +44,24 @@ class Strip:
         self.monochrome_pixels(colour.Color(rgb=(0, 0, 0)))
 
 
-    def flash(self, color, wait_ms):
-        self.monochrome_pixels(color)
-        yield wait_ms
-        self.off_pixels()
-        yield wait_ms
+    def flash(self, colors, speed):
+        idx = 0
+
+        while True:
+            self.monochrome_pixels(colors[idx % len(colors)])
+            yield speed
+            self.off_pixels()
+            yield speed
+            idx += 1
 
 
-    def flash_for_n(self, from_color, flash_freq, wait_ms):
-        self.brightness = 255
-        for i in range(flash_freq):
-            for ms in self.flash(from_color, wait_ms):
-                yield ms
+    def flash_for(self, colors, speed, brightness=255, *, seconds=0, n=None):
+        self.brightness = brightness
+        flash_freq = n if n is not None else (seconds * 1000) / (speed * 2)
+        flash = self.flash(colors, speed)
 
-
-    def flash_for_seconds(self, colors, seconds, wait_ms):
-        self.brightness = 255
-        flash_freq = (seconds * 1000) / wait_ms
-
-        for idx in range(int(flash_freq)):
-            for ms in self.flash(colors[idx % len(colors)], wait_ms):
-                yield ms
-
-
-    # DEBUG
-    def flicker(self, color, flicker_seconds, wait_ms):
-        self.brightness = 50
-        flicker_freq = flicker_seconds / wait_ms
-
-        # print(flicker_freq)
-
-        for _ in range(int(flicker_freq)):
-            for ms in self.flash(color, wait_ms):
-                yield ms
+        for _ in range(int(flash_freq * 2)):
+            yield next(flash)
 
 
     def on(self, color, seconds, brightness=255):
@@ -85,26 +70,26 @@ class Strip:
         yield seconds * 1000
 
 
-    def gradient(self, pixels, wait_ms, brightness=255):
+    def gradient(self, pixels, speed, brightness=255):
         self.brightness = brightness
 
         for i in range(self.length):
             if i < len(pixels):
                 self.set_pixel(i, pixels[i])
 
-        yield wait_ms
+        yield speed
 
 
-    def fade_brightness(self, start_brightness, end_brightness, wait_ms):
+    def fade_brightness(self, start_brightness, end_brightness, speed):
         self.brightness = start_brightness
 
         while self.brightness <= end_brightness:
-            yield wait_ms
+            yield speed
             self.brightness += 10
 
 
-    def flicker_brightness(self, low_brightness, high_brightness, wait_ms):
-        flicker_freq = (10*1000) / wait_ms
+    def flicker_brightness(self, low_brightness, high_brightness, speed):
+        flicker_freq = (10*1000) / speed
         brightness = low_brightness
         up = True
 
@@ -119,18 +104,18 @@ class Strip:
                     up = True
 
             self.brightness = brightness
-            yield wait_ms
+            yield speed
 
 
-    def wipe(self, pixels, wait_ms):
+    def wipe(self, pixels, speed):
         """Wipe color across display a pixel at a time."""
         for i in range(self.length):
             if i < len(pixels):
                 self.set_pixel(i, pixels[i])
-                yield wait_ms
+                yield speed
 
 
-    def cycle(self, pixels, wait_ms):
+    def cycle(self, pixels, speed):
         # In cases where the colors don't divide perfectly into the strip, this
         # will be larger than the strip length!
         elements = pixels * ceil(self.length / len(pixels))
@@ -140,7 +125,7 @@ class Strip:
                 self.set_pixel(i, color)
 
             elements.append(elements.pop(0))
-            yield wait_ms
+            yield speed
 
 
 
