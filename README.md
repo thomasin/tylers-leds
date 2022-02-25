@@ -18,4 +18,4 @@ locally preview led animations:
 ```
 python src/animatetools.py
 ```
-and enter the animation number you want to see (does not show brightness changes)
+and enter the animation number you want to see

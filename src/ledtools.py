@@ -41,21 +41,21 @@ class Strip:
 
 
     def off_pixels(self):
-        self.monochrome_pixels(Color(0, 0, 0))
+        self.monochrome_pixels(colour.Color(rgb=(0, 0, 0)))
 
 
     def flash(self, color, wait_ms):
         self.monochrome_pixels(color)
         yield wait_ms
         self.off_pixels()
-        yield 0
+        yield wait_ms
 
 
     def flash_for_n(self, from_color, flash_freq, wait_ms):
         self.brightness = 255
         for i in range(flash_freq):
-            self.flash(from_color, wait_ms)
-            yield wait_ms
+            for ms in self.flash(from_color, wait_ms):
+                yield ms
 
 
     def flash_for_seconds(self, colors, seconds, wait_ms):
@@ -63,17 +63,20 @@ class Strip:
         flash_freq = (seconds * 1000) / wait_ms
 
         for idx in range(int(flash_freq)):
-            self.flash(colors[idx % len(colors)], wait_ms)
-            yield wait_ms
+            for ms in self.flash(colors[idx % len(colors)], wait_ms):
+                yield ms
 
 
+    # DEBUG
     def flicker(self, color, flicker_seconds, wait_ms):
         self.brightness = 50
         flicker_freq = flicker_seconds / wait_ms
 
+        # print(flicker_freq)
+
         for _ in range(int(flicker_freq)):
-            self.flash(color, wait_ms)
-            yield wait_ms
+            for ms in self.flash(color, wait_ms):
+                yield ms
 
 
     def on(self, color, seconds, brightness=255):
@@ -93,12 +96,11 @@ class Strip:
 
 
     def fade_brightness(self, start_brightness, end_brightness, wait_ms):
-        brightness = start_brightness
+        self.brightness = start_brightness
 
-        while brightness <= end_brightness:
-            self.brightnesss = brightness
+        while self.brightness <= end_brightness:
             yield wait_ms
-            brightness += 10
+            self.brightness += 10
 
 
     def flicker_brightness(self, low_brightness, high_brightness, wait_ms):

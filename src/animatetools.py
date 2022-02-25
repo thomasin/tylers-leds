@@ -207,6 +207,7 @@ animations = {
     30:  color_swipe_to_color(ORANGE, 5, YELLOW, BETWEEN_LED_CHANGES_SLOW, YELLOW, 5),
     31:  color_swipe_to_color(PURPLE, 5, YELLOW, BETWEEN_LED_CHANGES_SLOW, YELLOW, 5),
 
+    # Debug
     32:  flicker_then_on(LIME, 5, LIME, LOW_BRIGHTNESS, 5),
     33:  flicker_then_on(BLUE, 5, BLUE, LOW_BRIGHTNESS, 5),
     34:  flicker_then_on(RED, 5, RED, LOW_BRIGHTNESS, 5),
@@ -219,6 +220,7 @@ animations = {
     42:  flicker_then_on(TURQUOISE, 5, TURQUOISE, LOW_BRIGHTNESS, 5),
     43:  flicker_then_on(AQUA, 5, AQUA, LOW_BRIGHTNESS, 5),
     44:  flicker_then_on(PINK, 5, PINK, LOW_BRIGHTNESS, 5),
+    # --
 
     45:  flash_then_on(RED, 3, BLUE, HIGH_BRIGHTNESS, 10),
     46:  flash_then_on(BLUE, 3, LIME, HIGH_BRIGHTNESS, 10),
@@ -335,16 +337,6 @@ animations = {
     144: strip_length_cycle(lambda n: colortools.gradient(n // 4, PURPLE, BLACK) + colortools.gradient(n // 4, BLUE, BLACK)),
     145: strip_length_cycle(lambda n: colortools.gradient(n // 4, ORANGE, BLACK) + colortools.gradient(n // 4, WHITE, BLACK)),
 
-    # 121: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    # 123: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    # 124: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    # 125: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    # 126: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    # 127: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    # 128: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    # 129: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    # 130: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-
     150: gradient_expand(RED, YELLOW),
     151: gradient_expand(BLUE, LIME),
     152: gradient_expand(PURPLE, ORANGE),
@@ -359,20 +351,22 @@ def get_color_escape(r, g, b, background=False):
 
 
 if __name__ == '__main__':
-    leds = ledtools.Strip(None, 100, PINK, 255)
+    leds = ledtools.Strip(None, 290, PINK, 255)
 
     while True:
-        cmd = input('Next: ')
+        cmd = input('✨ \033[94mNext:\033[0m ')
         print('', end='\r')
 
         animation = animations.get(int(cmd))
 
         if animation is not None:
             for ms in animation(leds):
+                brightness = leds.brightness / 255
                 output = ""
 
                 for pixel in leds.pixels:
-                    output += get_color_escape(int(pixel.red * 255), int(pixel.green * 255), int(pixel.blue * 255), False)
+                    color = colour.Color(hsl=(pixel.hue, pixel.saturation, pixel.luminance * brightness))
+                    output += get_color_escape(int(color.red * 255), int(color.green * 255), int(color.blue * 255), False)
                     output += "◼︎"
                     output += RESET
 
