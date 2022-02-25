@@ -14,7 +14,7 @@ import animatetools
 
 
 # LED strip configuration:
-LED_COUNT           = 10     # Number of LED pixels.
+LED_COUNT           = 290     # Number of LED pixels.
 LEDTEMP_PIN         = 12      # GPIO pin connected to the temperature pixels (must support PWM!).
 LEDHUMIDITY_PIN     = 13      # GPIO pin connected to the humidity pixels (must support PWM!).
 LED_FREQ_HZ         = 800000  # LED signal frequency in hertz (usually 800khz)

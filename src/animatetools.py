@@ -1,5 +1,7 @@
 import colour
 import colortools
+import ledtools
+import time
 from math import ceil
 
 
@@ -133,10 +135,9 @@ def rainbow_wipe(colors):
     return with_strip
 
 
-def rainbow_cycle(colors):
+def strip_length_cycle(pixels):
     def with_strip(strip):
-        pixels = colortools.rainbow(strip.length, colors)
-        generator = strip.cycle(pixels, BETWEEN_LED_CHANGES_FAST)
+        generator = strip.cycle(pixels(strip.length), BETWEEN_LED_CHANGES_FAST)
 
         for idx in range(strip.length * 2):
             yield next(generator)
@@ -144,9 +145,8 @@ def rainbow_cycle(colors):
     return with_strip
 
 
-def gradient_cycle(from_color, to_color):
+def cycle(pixels):
     def with_strip(strip):
-        pixels = colortools.gradient(strip.length, from_color, to_color)
         generator = strip.cycle(pixels, BETWEEN_LED_CHANGES_FAST)
 
         for idx in range(strip.length * 2):
@@ -160,10 +160,10 @@ def gradient_expand(end_color, middle_color):
     def with_strip(strip):
         for idx in range(ceil(strip.length / 2)):
             pixels = colortools.Scale([
-                (end_color, 0),
+                (end_color, -1),
                 (middle_color, (strip.length // 2) - idx),
                 (middle_color, (strip.length // 2) + idx),
-                (end_color, strip.length - 1),
+                (end_color, strip.length),
             ])
 
             for x in strip.gradient(pixels.between(0, strip.length), BETWEEN_LED_CHANGES_FAST):
@@ -283,27 +283,57 @@ animations = {
     99:  rainbow_wipe([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
     100: rainbow_wipe([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
 
-    101: gradient_cycle(LIME, BLACK),
-    102: gradient_cycle(RED, BLACK),
-    103: gradient_cycle(BLUE, BLACK),
-    104: gradient_cycle(YELLOW, BLACK),
-    105: gradient_cycle(ORANGE, BLACK),
-    106: gradient_cycle(WHITE, BLACK),
-    107: gradient_cycle(GOLD, BLACK),
-    108: gradient_cycle(SPRING_GREEN, BLACK),
-    109: gradient_cycle(TURQUOISE, BLACK),
-    110: gradient_cycle(AQUA, BLACK),
-    111: gradient_cycle(PINK, BLACK),
+    101: strip_length_cycle(lambda n: colortools.gradient(n, LIME, BLACK)),
+    102: strip_length_cycle(lambda n: colortools.gradient(n, RED, BLACK)),
+    103: strip_length_cycle(lambda n: colortools.gradient(n, BLUE, BLACK)),
+    104: strip_length_cycle(lambda n: colortools.gradient(n, YELLOW, BLACK)),
+    105: strip_length_cycle(lambda n: colortools.gradient(n, ORANGE, BLACK)),
+    106: strip_length_cycle(lambda n: colortools.gradient(n, WHITE, BLACK)),
+    107: strip_length_cycle(lambda n: colortools.gradient(n, GOLD, BLACK)),
+    108: strip_length_cycle(lambda n: colortools.gradient(n, SPRING_GREEN, BLACK)),
+    109: strip_length_cycle(lambda n: colortools.gradient(n, TURQUOISE, BLACK)),
+    110: strip_length_cycle(lambda n: colortools.gradient(n, AQUA, BLACK)),
+    111: strip_length_cycle(lambda n: colortools.gradient(n, PINK, BLACK)),
 
-    112: rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    113: rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    114: rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    115: rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    116: rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    117: rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    118: rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    119: rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
-    120: rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
+    112: strip_length_cycle(lambda n: colortools.rainbow(n, [RED, YELLOW, PURPLE, BLUE, ORANGE, LIME])),
+    113: strip_length_cycle(lambda n: colortools.rainbow(n, [RED, YELLOW, PURPLE, BLUE, ORANGE, LIME])),
+    114: strip_length_cycle(lambda n: colortools.rainbow(n, [RED, YELLOW, PURPLE, BLUE, ORANGE, LIME])),
+    115: strip_length_cycle(lambda n: colortools.rainbow(n, [RED, YELLOW, PURPLE, BLUE, ORANGE, LIME])),
+    116: strip_length_cycle(lambda n: colortools.rainbow(n, [RED, YELLOW, PURPLE, BLUE, ORANGE, LIME])),
+    117: strip_length_cycle(lambda n: colortools.rainbow(n, [RED, YELLOW, PURPLE, BLUE, ORANGE, LIME])),
+    118: strip_length_cycle(lambda n: colortools.rainbow(n, [RED, YELLOW, PURPLE, BLUE, ORANGE, LIME])),
+    119: strip_length_cycle(lambda n: colortools.rainbow(n, [RED, YELLOW, PURPLE, BLUE, ORANGE, LIME])),
+    120: strip_length_cycle(lambda n: colortools.rainbow(n, [RED, YELLOW, PURPLE, BLUE, ORANGE, LIME])),
+
+    121: cycle([PINK] * 10 + [LIME] * 10),
+    122: cycle([BLUE] * 10 + [YELLOW] * 10),
+    123: cycle([PURPLE] * 10 + [ORANGE] * 10),
+    124: cycle([SPRING_GREEN] * 10 + [RED] * 10),
+    125: cycle([GOLD] * 10 + [AQUA] * 10),
+
+    126: cycle([BLACK] * 3 + [RED] * 2),
+    127: cycle([BLACK] * 3 + [YELLOW] * 2),
+    128: cycle([BLACK] * 3 + [PURPLE] * 2),
+    129: cycle([BLACK] * 3 + [BLUE] * 2),
+    130: cycle([BLACK] * 3 + [ORANGE] * 2),
+    131: cycle([BLACK] * 3 + [LIME] * 2),
+
+    132: cycle(colortools.Scale([(PINK, 0), (PURPLE, 10), (PINK, 20)]).between(0, 20)),
+    133: cycle(colortools.Scale([(RED, 0), (YELLOW, 10), (RED, 20)]).between(0, 20)),
+    134: cycle(colortools.Scale([(LIME, 0), (BLUE, 10), (LIME, 20)]).between(0, 20)),
+    135: cycle(colortools.Scale([(LIME, 0), (BLUE, 10), (LIME, 20)]).between(0, 20)),
+    136: cycle(colortools.Scale([(ORANGE, 0), (GOLD, 10), (ORANGE, 20)]).between(0, 20)),
+
+    137: cycle([BLACK] * 5 + [RED] * 2 + [LIME] * 7 + [RED] * 2 + [BLACK] * 5),
+    138: cycle([BLACK] * 5 + [YELLOW] * 2 + [BLUE] * 7 + [YELLOW] * 2 + [BLACK] * 5),
+    139: cycle([BLACK] * 5 + [PURPLE] * 2 + [PINK] * 7 + [PURPLE] * 2 + [BLACK] * 5),
+    140: cycle([BLACK] * 5 + [LIME] * 2 + [ORANGE] * 7 + [LIME] * 2 + [BLACK] * 5),
+    141: cycle([BLACK] * 5 + [AQUA] * 2 + [TURQUOISE] * 7 + [AQUA] * 2 + [BLACK] * 5),
+
+    142: strip_length_cycle(lambda n: colortools.gradient(n // 4, PINK, BLACK) + colortools.gradient(n // 4, LIME, BLACK)),
+    143: strip_length_cycle(lambda n: colortools.gradient(n // 4, AQUA, BLACK) + colortools.gradient(n // 4, GOLD, BLACK)),
+    144: strip_length_cycle(lambda n: colortools.gradient(n // 4, PURPLE, BLACK) + colortools.gradient(n // 4, BLUE, BLACK)),
+    145: strip_length_cycle(lambda n: colortools.gradient(n // 4, ORANGE, BLACK) + colortools.gradient(n // 4, WHITE, BLACK)),
 
     # 121: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
     # 123: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
@@ -315,5 +345,41 @@ animations = {
     # 129: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
     # 130: faded_rainbow_cycle([RED, YELLOW, PURPLE, BLUE, ORANGE, LIME]),
 
-    131: gradient_expand(RED, YELLOW),
+    150: gradient_expand(RED, YELLOW),
+    151: gradient_expand(BLUE, LIME),
+    152: gradient_expand(PURPLE, ORANGE),
+    153: gradient_expand(PINK, BLACK),
 }
+
+
+RESET = '\033[0m'
+
+def get_color_escape(r, g, b, background=False):
+    return '\033[{};2;{};{};{}m'.format(48 if background else 38, r, g, b)
+
+
+if __name__ == '__main__':
+    leds = ledtools.Strip(None, 100, PINK, 255)
+
+    while True:
+        cmd = input('Next: ')
+        print('', end='\r')
+
+        animation = animations.get(int(cmd))
+
+        if animation is not None:
+            for ms in animation(leds):
+                output = ""
+
+                for pixel in leds.pixels:
+                    output += get_color_escape(int(pixel.red * 255), int(pixel.green * 255), int(pixel.blue * 255), False)
+                    output += "◼︎"
+                    output += RESET
+
+                print(output, end='\r')
+                time.sleep(ms/1000)
+
+
+
+
+
